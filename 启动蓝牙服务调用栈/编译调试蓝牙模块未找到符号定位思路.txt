@@ -1,0 +1,77 @@
+uos@uos:~/Desktop/x86-kernel$ nm vmlinux | grep selinux_socket_sendmsg
+ffffffff8131fe80 t selinux_socket_sendmsg
+# 找不到蓝牙函数hci_sock_sendmsg符号
+uos@uos:~/Desktop/git/x86-kernel$ nm vmlinux | grep hci_sock_sendmsg
+uos@uos:~/Desktop/git/x86-kernel$ 
+
+# 通过查看hci_sock_sendmsg对应的源码文件目录下的Makefile,查询内核对应的编译开关
+# 编译开关为 BT
+uos@uos:~/Desktop/x86-kernel/net/bluetooth$ cat Makefile
+# SPDX-License-Identifier: GPL-2.0
+#
+# Makefile for the Linux Bluetooth subsystem.
+#
+
+obj-$(CONFIG_BT)        += bluetooth.o
+obj-$(CONFIG_BT_RFCOMM) += rfcomm/
+obj-$(CONFIG_BT_BNEP)   += bnep/
+obj-$(CONFIG_BT_CMTP)   += cmtp/
+obj-$(CONFIG_BT_HIDP)   += hidp/
+obj-$(CONFIG_BT_6LOWPAN) += bluetooth_6lowpan.o
+
+bluetooth_6lowpan-y := 6lowpan.o
+
+bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+        hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o lib.o \
+        ecdh_helper.o hci_request.o mgmt_util.o
+
+bluetooth-$(CONFIG_BT_BREDR) += sco.o
+bluetooth-$(CONFIG_BT_HS) += a2mp.o amp.o
+bluetooth-$(CONFIG_BT_LEDS) += leds.o
+bluetooth-$(CONFIG_BT_DEBUGFS) += hci_debugfs.o
+bluetooth-$(CONFIG_BT_SELFTEST) += selftest.o
+
+# 开启开关后,查看.config文件
+
+uos@uos:~/Desktop/x86-kernel$ cat .config|grep BT
+# CONFIG_BLK_WBT is not set
+CONFIG_BT=y
+CONFIG_BT_BREDR=y
+# CONFIG_BT_RFCOMM is not set
+# CONFIG_BT_BNEP is not set
+# CONFIG_BT_HIDP is not set
+CONFIG_BT_HS=y
+CONFIG_BT_LE=y
+# CONFIG_BT_LEDS is not set
+# CONFIG_BT_SELFTEST is not set
+CONFIG_BT_DEBUGFS=y
+# CONFIG_BT_HCIBTUSB is not set
+# CONFIG_BT_HCIUART is not set
+# CONFIG_BT_HCIBCM203X is not set
+# CONFIG_BT_HCIBPA10X is not set
+# CONFIG_BT_HCIBFUSB is not set
+# CONFIG_BT_HCIDTL1 is not set
+# CONFIG_BT_HCIBT3C is not set
+# CONFIG_BT_HCIBLUECARD is not set
+# CONFIG_BT_HCIVHCI is not set
+# CONFIG_BT_MRVL is not set
+# CONFIG_BT_RTK_BTUSB is not set
+CONFIG_MAC_EMUMOUSEBTN=y
+# CONFIG_TABLET_USB_KBTAB is not set
+# CONFIG_INPUT_ATLAS_BTNS is not set
+# CONFIG_SND_BT87X is not set
+# CONFIG_DELL_RBTN is not set
+# CONFIG_TOSHIBA_BT_RFKILL is not set
+# CONFIG_INTEL_VBTN is not set
+# CONFIG_BTRFS_FS is not set
+CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE=y
+# CONFIG_RBTREE_TEST is not set
+
+# 配置后重新编译,重新查看,可以搜索到符号
+uos@uos:~/Desktop/x86-kernel$ readelf -a vmlinux | grep hci_sock_sendmsg
+ 68827: ffffffff81942da0  2429 FUNC    LOCAL  DEFAULT    1 hci_sock_sendmsg
+uos@uos:~/Desktop/x86-kernel$ nm vmlinux | grep hci_sock_sendmsg
+ffffffff81942da0 t hci_sock_sendmsg
+uos@uos:~/Desktop/x86-kernel$ 
+
+
