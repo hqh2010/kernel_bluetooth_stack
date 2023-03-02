@@ -232,3 +232,5 @@ sudo journalctl -f -k
 ](https://github.com/realwujing/linux-learning/blob/main/kernel/qemu/%E5%9F%BA%E4%BA%8Eqemu%20tap(NAT%E7%BD%91%E7%BB%9C)%E3%80%81debootstrap%20%E8%B0%83%E8%AF%95%E5%86%85%E6%A0%B8%E3%80%81%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F.md)
 
 https://stackoverflow.com/questions/45044504/bluetooth-programming-in-c-secure-connection-and-data-transfer
+
+https://blog.csdn.net/wangzhen209/category_5885205.html
